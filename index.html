@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ReadWise - Interactive Reading</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Georgia', serif;
+      background: #faf8f5;
+      color: #2c2c2c;
+      line-height: 1.8;
+    }
+    
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      padding: 30px 20px;
+      text-align: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    header h1 {
+      color: #e8d5b7;
+      font-size: 2.5rem;
+      font-weight: 400;
+      letter-spacing: 3px;
+    }
+    header p {
+      color: #8b8b8b;
+      margin-top: 10px;
+      font-style: italic;
+    }
+
+    /* Story Selector */
+    .story-selector {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+    .story-selector h2 {
+      font-size: 1.2rem;
+      color: #666;
+      margin-bottom: 20px;
+      font-weight: 400;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+    .story-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+    }
+    .story-card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
+    .story-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+    }
+    .story-card h3 {
+      font-size: 1.3rem;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+    }
+    .story-card p {
+      font-size: 0.9rem;
+      color: #666;
+      line-height: 1.5;
+    }
+    .story-card .meta {
+      margin-top: 15px;
+      font-size: 0.8rem;
+      color: #999;
+    }
+
+    /* Reader View */
+    .reader {
+      max-width: 700px;
+      margin: 0 auto;
+      padding: 40px 20px 100px;
+      display: none;
+    }
+    .reader.active {
+      display: block;
+    }
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: #666;
+      text-decoration: none;
+      font-size: 0.9rem;
+      margin-bottom: 30px;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+    .back-btn:hover {
+      color: #1a1a2e;
+    }
+    .reader h1 {
+      font-size: 2.2rem;
+      color: #1a1a2e;
+      margin-bottom: 10px;
+      font-weight: 400;
+    }
+    .reader .author {
+      color: #888;
+      font-style: italic;
+      margin-bottom: 40px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #eee;
+    }
+    .reader .content {
+      font-size: 1.15rem;
+      text-align: justify;
+    }
+    .word {
+      text-decoration: underline;
+      text-decoration-color: #d4a574;
+      text-decoration-style: dotted;
+      text-underline-offset: 3px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+    }
+    .word:hover {
+      background: #d4a574;
+      color: white;
+    }
+
+    /* Definition Popup */
+    .definition-popup {
+      position: fixed;
+      background: #1a1a2e;
+      color: white;
+      padding: 15px 20px;
+      border-radius: 10px;
+      max-width: 300px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+      z-index: 1000;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+    .definition-popup.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .definition-popup .word-title {
+      font-weight: bold;
+      color: #e8d5b7;
+      margin-bottom: 5px;
+    }
+    .definition-popup .close-btn {
+      position: absolute;
+      top: 8px;
+      right: 10px;
+      cursor: pointer;
+      opacity: 0.6;
+      font-size: 1.2rem;
+    }
+    .definition-popup .close-btn:hover {
+      opacity: 1;
+    }
+
+    /* Summary Section */
+    .summary {
+      margin-top: 50px;
+      padding: 30px;
+      background: linear-gradient(135deg, #f8f6f1 0%, #ebe8e0 100%);
+      border-radius: 12px;
+      border-left: 4px solid #d4a574;
+    }
+    .summary h3 {
+      font-size: 1.1rem;
+      color: #1a1a2e;
+      margin-bottom: 15px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .summary p {
+      color: #555;
+      font-size: 1rem;
+      line-height: 1.7;
+    }
+
+    /* Reading Progress */
+    .progress-bar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #d4a574, #e8d5b7);
+      width: 0%;
+      transition: width 0.2s;
+      z-index: 1001;
+    }
+
+    /* Hidden class */
+    .hidden {
+      display: none !important;
+    }
+  </style>
+</head>
+<body>
+  <div class="progress-bar" id="progressBar"></div>
+  
+  <header>
+    <h1>📖 ReadWise</h1>
+    <p>Click any underlined word to learn its meaning</p>
+  </header>
+
+  <!-- Story Selector -->
+  <div class="story-selector" id="storySelector">
+    <h2>Choose a Story</h2>
+    <div class="story-grid" id="storyGrid"></div>
+  </div>
+
+  <!-- Reader -->
+  <div class="reader" id="reader">
+    <a class="back-btn" onclick="goBack()">← Back to stories</a>
+    <h1 id="storyTitle"></h1>
+    <p class="author" id="storyAuthor"></p>
+    <div class="content" id="storyContent"></div>
+  </div>
+
+  <!-- Definition Popup -->
+  <div class="definition-popup" id="definitionPopup">
+    <span class="close-btn" onclick="hideDefinition()">×</span>
+    <div class="word-title" id="popupWord"></div>
+    <div id="popupDefinition"></div>
+  </div>
+
+  <script>
+    // Story Data
+    const stories = [
+      {
+        id: 1,
+        title: "The Last Lighthouse Keeper",
+        author: "A Tale of Solitude",
+        preview: "A poignant story about a man who has spent fifty years tending the lonely lighthouse on Eagle Rock.",
+        content: `Thomas had lived on Eagle Rock for fifty-two years. Every morning, he would climb the spiral stairs to light the great lens that guided ships through the treacherous waters. The isolation was profound, but he had grown to cherish it.
+
+His morning ritual began at dawn. The <span class="word" data-word="crimson">crimson</span> sunrise would paint the sky in shades of orange and pink, a spectacle that never grew old. He would make his tea—strong, with a drop of honey—and ascend the tower.
+
+The lighthouse had become his <span class="word" data-word="sanctuary">sanctuary</span>, a place where time moved differently. The <span class="word" data-word="ebullient">ebullient</span> waves crashed against the rocks below, their <span class="word" data-word="melodic">melodic</span> rhythm a constant companion. In the quiet moments, he would read the old books that lined his small library, their pages yellowed with age.
+
+One winter, a terrible storm arrived. The wind howled with <span class="word" data-word="ferocious">ferocious</span> intensity, and the sea became a churning mass of <span class="word" data-word="turbulent">turbulent</span> water. Thomas knew that somewhere out there, a fishing boat was struggling to return to harbor. He lit the lamp extra bright, its <span class="word" data-word="luminous">luminous</span> beam cutting through the darkness like a sword.
+
+When morning came, the storm had passed. The boat had made it safely to port. Thomas stood at his window, watching the sun rise over a peaceful sea, knowing that his work still mattered.`,
+        summary: "This story explores themes of solitude, purpose, and dedication. Thomas, the lighthouse keeper, finds meaning in his isolated life through his daily rituals and the knowledge that his work saves lives. The storm scene highlights the importance of perseverance and the profound impact one person can have, even alone."
+      },
+      {
+        id: 2,
+        title: "The Garden of Memories",
+        author: "A Story of Growth",
+        preview: "A young woman inherits her grandmother's mysterious garden and discovers its magical properties.",
+        content: `When Maya inherited her grandmother's cottage, she didn't expect to find a garden that seemed to exist outside of time. The flowers bloomed in impossible colors, and the trees bore fruit that tasted of memories.
+
+Her grandmother had always been <span class="word" data-word="eccentric">eccentric</span>, known for her peculiar habits and the way she spoke to plants as if they could understand. Now, standing in the garden, Maya understood why.
+
+The roses were <span class="word" data-word="verdant">verdant</span> and lush, their petals soft as silk. A small pond reflected the sky like a mirror, its surface <span class="word" data-word="serene">serene</span> and clear. Maya spent her days tending to the plants, learning their secrets.
+
+One day, she bit into a golden apple and suddenly remembered her grandmother's laugh—that bright, <span class="word" data-word="effervescent">effervescent</span> sound that had always made her feel safe. Another fruit tasted of summer rain on hot pavement, another of the chalk dust in her old classroom.
+
+The garden was not just a collection of plants; it was a living archive of moments, a place where memories could be <span class="word" data-word="savored">savored</span> again. Maya realized that her grandmother's greatest gift was not the cottage or the garden, but the understanding that love never truly fades—it simply waits to be remembered.`,
+        summary: "The Garden of Memories is a touching story about legacy, loss, and the way love persists beyond death. Through the magical garden, Maya learns that our memories are precious gifts, and that those we lose live on in the moments we remember."
+      },
+      {
+        id: 3,
+        title: "The Coffee Shop on Maple Street",
+        author: "Urban Tales",
+        preview: "A heartwarming story about strangers who become family in a small neighborhood coffee shop.",
+        content: `The coffee shop sat on the corner of Maple and Fifth, a <span class="word" data-word="quaint">quaint</span> little place with worn wooden floors and the smell of fresh roasted beans. Its owner, Maria, had run it for thirty years, and she knew every customer by name.
+
+On a cold November morning, a young man named Daniel walked in, shivering from the <span class="word" data-word="biting">biting</span> wind. He was new in town, having moved for a job that hadn't worked out. Maria handed him a cup of coffee—on the house—and told him to sit wherever he liked.
+
+Over the following weeks, Daniel became a regular. He noticed that the shop attracted an eclectic <span class="word" data-word="assortment">assortment</span> of people: the elderly professor who came for his morning paper, the tired mother with her energetic toddler, the aspiring writer who typed furiously at the corner table.
+
+One evening, when the power went out, Maria lit candles and the customers stayed. They shared stories, their <span class="word" data-word="convivial">convivial</span> atmosphere turning strangers into friends. Daniel realized that home wasn't a place—it was the people who made you feel like you belonged.
+
+By Christmas, Daniel had found a new job and new friends. He had also discovered that the coffee shop had become his anchor, a place where he was always welcome. Maria's simple act of kindness had created a <span class="word" data-word="ripple">ripple</span> effect, touching everyone who walked through those doors.`,
+        summary: "This story celebrates community and the small acts of kindness that bind us together. Through Maria's coffee shop, we see how one person's warmth can create a ripple effect, transforming strangers into a family."
+      },
+      {
+        id: 4,
+        title: "The Art of Letting Go",
+        author: "Reflections",
+        preview: "A reflective essay on finding peace in acceptance and the courage required to release what we cannot hold.",
+        content: `We spend so much of our lives holding on. We grip our dreams tightly, terrified that letting go means failure. We cling to relationships that have run their course, mistaking <span class="word" data-word="persistence">persistence</span> for commitment. We hold onto anger like a treasured possession, not realizing it's weighing us down.
+
+But what if letting go isn't giving up? What if it's actually the bravest thing we can do?
+
+The Japanese art of <span class="word" data-word="kintsugi">kintsugi</span> teaches us something profound. When a ceramic bowl breaks, rather than hiding the cracks or discarding the piece, they repair it with gold. The <span class="word" data-word="flaw">flaw</span> becomes part of the object's history, its story enhanced rather than diminished.
+
+Similarly, our losses and failures are not endpoints but transformations. The <span class="word" data-word="resilient">resilient</span> human spirit doesn't pretend that pain doesn't exist—we acknowledge it, honor it, and then release it.
+
+Letting go requires <span class="word" data-word="vulnerability">vulnerability</span>. It means admitting that we cannot control everything. It means trusting that what comes next might be even more beautiful than what we're afraid to lose.
+
+In the end, we are not defined by what we hold onto, but by what we're willing to release.`,
+        summary: "This essay explores the difficult but necessary art of letting go. Using kintsugi as a metaphor, the author argues that our scars and losses can become sources of beauty and strength. True courage lies not in holding on, but in releasing what no longer serves us."
+      },
+      {
+        id: 5,
+        title: "The Midnight Train",
+        author: "Mystery Short Story",
+        preview: "A mysterious stranger boards a train that shouldn't exist, leading to an unforgettable journey.",
+        content: `The clock struck midnight as Sarah found herself standing on an empty platform she had never seen before. The old sign read "Platform 9½"—impossible, yet there it was.
+
+A train emerged from the <span class="word" data-word="silhouetted">silhouetted</span> darkness, its cars gleaming with an otherworldly <span class="word" data-word="luminescence">luminescence</span>. The conductor, a tall man with <span class="word" data-word="piercing">piercing</span> eyes, smiled warmly.
+
+"Last train of the evening," he said. "Destination: Anywhere you need to go."
+
+Sarah, exhausted from months of grief after her mother's passing, stepped aboard. The car was empty except for an elderly woman knitting in the corner. She looked up and smiled—"Same journey, different passenger."
+
+As the train moved, the windows showed not the familiar city, but scenes from Sarah's life. She saw her mother laughing at the kitchen table, teaching her to ride a bike, holding her hand on the first day of school.
+
+The <span class="word" data-word="cathartic">cathartic</span> experience washed over her like a wave. She cried, but these were tears of healing, not pain.
+
+When the train stopped, the conductor bowed. "Destination: Acceptance. Thank you for riding."
+
+Sarah woke in her own bed, the morning sun streaming through the window. But on her nightstand sat a small golden key—and a note: "For when you need to visit again."`,
+        summary: "The Midnight Train is a magical realism story about grief and healing. Sarah's journey on the impossible train allows her to process her mother's death by reliving precious memories. The story suggests that closure comes not from forgetting, but from finding peace in our memories."
+      }
+    ];
+
+    // Word Definitions
+    const definitions = {
+      "crimson": "A deep, rich red color, like the sky at sunset or blood.",
+      "sanctuary": "A place of safety, refuge, or retreat; a holy place.",
+      "ebullient": "Cheerful and full of energy; enthusiastic.",
+      "melodic": "Having a pleasant, musical sound; relating to melody.",
+      "ferocious": "Savagely fierce or violent; intense.",
+      "turbulent": "Characterized by conflict, disorder, or violent movement.",
+      "luminous": "Emitting or reflecting light; bright or shining.",
+      "eccentric": "Unconventional and slightly strange; off-center.",
+      "verdant": "Green with grass or other rich vegetation; lush.",
+      "serene": "Calm, peaceful, and untroubled.",
+      "effervescent": "Vivacious and enthusiastic; giving off bubbles.",
+      "savored": "Enjoyed something slowly or thoroughly; appreciated.",
+      "quaint": "Attractively unusual or old-fashioned; charming.",
+      "biting": "Sharp and painfully cold; sarcastic.",
+      "assortment": "A collection of various different things or people.",
+      "convivial": "Friendly, warm, and pleasant; festive.",
+      "ripple": "A small wave or series of waves; a spreading effect.",
+      "persistence": "The continued existence or occurrence of something.",
+      "kintsugi": "A Japanese art form of repairing broken pottery with gold.",
+      "flaw": "A mark, crack, or fault that spoils appearance or structure.",
+      "resilient": "Able to recover quickly from difficulties; tough.",
+      "vulnerability": "The quality of being open to harm or attack.",
+      "silhouetted": "Seen as a dark shape or outline against a lighter background.",
+      "luminescence": "The emission of light by a substance not due to heat.",
+      "piercing": "Sharp and penetrating; going straight to the point.",
+      "cathartic": "Providing psychological relief through emotion; purifying."
+    };
+
+    let currentStory = null;
+
+    // Initialize
+    function init() {
+      renderStoryGrid();
+      setupWordClicks();
+      window.addEventListener('scroll', updateProgress);
+    }
+
+    function renderStoryGrid() {
+      const grid = document.getElementById('storyGrid');
+      grid.innerHTML = stories.map(story => `
+        <div class="story-card" onclick="openStory(${story.id})">
+          <h3>${story.title}</h3>
+          <p>${story.preview}</p>
+          <div class="meta">${story.author}</div>
+        </div>
+      `).join('');
+    }
+
+    function openStory(id) {
+      currentStory = stories.find(s => s.id === id);
+      if (!currentStory) return;
+
+      document.getElementById('storySelector').classList.add('hidden');
+      document.getElementById('reader').classList.add('active');
+      
+      document.getElementById('storyTitle').textContent = currentStory.title;
+      document.getElementById('storyAuthor').textContent = `By ${currentStory.author}`;
+      
+      // Add content with summary
+      document.getElementById('storyContent').innerHTML = currentStory.content + 
+        `<div class="summary">
+          <h3>📝 Summary</h3>
+          <p>${currentStory.summary}</p>
+        </div>`;
+
+      // Re-setup word clicks for new content
+      setupWordClicks();
+      
+      // Reset progress
+      updateProgress();
+    }
+
+    function goBack() {
+      document.getElementById('storySelector').classList.remove('hidden');
+      document.getElementById('reader').classList.remove('active');
+      currentStory = null;
+      document.getElementById('progressBar').style.width = '0%';
+    }
+
+    function setupWordClicks() {
+      document.querySelectorAll('.word').forEach(word => {
+        word.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showDefinition(word.dataset.word, e);
+        });
+      });
+    }
+
+    function showDefinition(word, event) {
+      const popup = document.getElementById('definitionPopup');
+      const definition = definitions[word.toLowerCase()] || "No definition available.";
+      
+      document.getElementById('popupWord').textContent = word;
+      document.getElementById('popupDefinition').textContent = definition;
+
+      // Position popup
+      const x = event.pageX;
+      const y = event.pageY;
+      
+      // Keep popup in viewport
+      const popupWidth = 300;
+      const popupHeight = 150;
+      
+      let left = x + 15;
+      let top = y + 15;
+      
+      if (left + popupWidth > window.innerWidth) {
+        left = x - popupWidth - 15;
+      }
+      if (top + popupHeight > window.innerHeight) {
+        top = y - popupHeight - 15;
+      }
+      
+      popup.style.left = left + 'px';
+      popup.style.top = top + 'px';
+      popup.classList.add('visible');
+    }
+
+    function hideDefinition() {
+      document.getElementById('definitionPopup').classList.remove('visible');
+    }
+
+    function updateProgress() {
+      if (!currentStory) return;
+      
+      const scrollTop = window.scrollY;
+      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      const progress = (scrollTop / docHeight) * 100;
+      
+      document.getElementById('progressBar').style.width = progress + '%';
+    }
+
+    // Close popup when clicking elsewhere
+    document.addEventListener('click', (e) => {
+      if (!e.target.classList.contains('word')) {
+        hideDefinition();
+      }
+    });
+
+    init();
+  </script>
+</body>
+</html>
