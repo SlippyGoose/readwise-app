@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ReadWise - Interactive Reading</title>
+  <title>ReadWise - Classic Literature</title>
   <style>
     * {
       margin: 0;
@@ -17,7 +17,6 @@
       line-height: 1.8;
     }
     
-    /* Header */
     header {
       background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
       padding: 30px 20px;
@@ -36,7 +35,6 @@
       font-style: italic;
     }
 
-    /* Story Selector */
     .story-selector {
       max-width: 800px;
       margin: 40px auto;
@@ -52,7 +50,7 @@
     }
     .story-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
       gap: 20px;
     }
     .story-card {
@@ -71,6 +69,12 @@
     .story-card h3 {
       font-size: 1.3rem;
       color: #1a1a2e;
+      margin-bottom: 8px;
+    }
+    .story-card .author {
+      font-size: 0.85rem;
+      color: #8b6914;
+      font-style: italic;
       margin-bottom: 10px;
     }
     .story-card p {
@@ -78,13 +82,7 @@
       color: #666;
       line-height: 1.5;
     }
-    .story-card .meta {
-      margin-top: 15px;
-      font-size: 0.8rem;
-      color: #999;
-    }
 
-    /* Reader View */
     .reader {
       max-width: 700px;
       margin: 0 auto;
@@ -109,37 +107,23 @@
       color: #1a1a2e;
     }
     .reader h1 {
-      font-size: 2.2rem;
+      font-size: 2rem;
       color: #1a1a2e;
-      margin-bottom: 10px;
-      font-weight: 400;
+      margin-bottom: 5px;
     }
     .reader .author {
-      color: #888;
+      color: #8b6914;
       font-style: italic;
       margin-bottom: 40px;
       padding-bottom: 20px;
       border-bottom: 1px solid #eee;
     }
     .reader .content {
-      font-size: 1.15rem;
+      font-size: 1.1rem;
       text-align: justify;
-    }
-    .word {
-      text-decoration: underline;
-      text-decoration-color: #d4a574;
-      text-decoration-style: dotted;
-      text-underline-offset: 3px;
-      cursor: pointer;
-      transition: all 0.2s;
-      position: relative;
-    }
-    .word:hover {
-      background: #d4a574;
-      color: white;
+      white-space: pre-wrap;
     }
 
-    /* Definition Popup */
     .definition-popup {
       position: fixed;
       background: #1a1a2e;
@@ -177,7 +161,6 @@
       opacity: 1;
     }
 
-    /* Summary Section */
     .summary {
       margin-top: 50px;
       padding: 30px;
@@ -198,7 +181,6 @@
       line-height: 1.7;
     }
 
-    /* Reading Progress */
     .progress-bar {
       position: fixed;
       top: 0;
@@ -210,7 +192,6 @@
       z-index: 1001;
     }
 
-    /* Hidden class */
     .hidden {
       display: none !important;
     }
@@ -221,16 +202,14 @@
   
   <header>
     <h1>📖 ReadWise</h1>
-    <p>Click any underlined word to learn its meaning</p>
+    <p>Classic Literature — Click underlined words for definitions</p>
   </header>
 
-  <!-- Story Selector -->
   <div class="story-selector" id="storySelector">
     <h2>Choose a Story</h2>
     <div class="story-grid" id="storyGrid"></div>
   </div>
 
-  <!-- Reader -->
   <div class="reader" id="reader">
     <a class="back-btn" onclick="goBack()">← Back to stories</a>
     <h1 id="storyTitle"></h1>
@@ -238,7 +217,6 @@
     <div class="content" id="storyContent"></div>
   </div>
 
-  <!-- Definition Popup -->
   <div class="definition-popup" id="definitionPopup">
     <span class="close-btn" onclick="hideDefinition()">×</span>
     <div class="word-title" id="popupWord"></div>
@@ -246,262 +224,235 @@
   </div>
 
   <script>
-    // Story Data
     const stories = [
       {
         id: 1,
-        title: "The Last Lighthouse Keeper",
-        author: "A Tale of Solitude",
-        preview: "A poignant story about a man who has spent fifty years tending the lonely lighthouse on Eagle Rock.",
-        content: `Thomas had lived on Eagle Rock for fifty-two years. Every morning, he would climb the spiral stairs to light the great lens that guided ships through the treacherous waters. The isolation was profound, but he had grown to cherish it.
+        title: "The Tell-Tale Heart",
+        author: "Edgar Allan Poe (1843)",
+        preview: "A haunting tale of guilt and madness, told by an unnamed narrator obsessed with an old man's eye.",
+        content: `True! nervous—very, very dreadfully nervous I had been and am; but why will you say that I am mad? The disease had sharpened my senses—not destroyed—not dulled them. Above all was the sense of hearing acute. I heard all things in the heaven and in the earth. I heard many things in hell. How then am I mad? Hearken! and observe how healthily—how calmly I can tell you the whole story.
 
-His morning ritual began at dawn. The <span class="word" data-word="crimson">crimson</span> sunrise would paint the sky in shades of orange and pink, a spectacle that never grew old. He would make his tea—strong, with a drop of honey—and ascend the tower.
+It is impossible to say how first the idea entered my brain; but, once conceived, it haunted me day and night. Object there was none. Passion there was none. I loved the old man. He had never wronged me. He had never given me insult. For his gold I had no desire. I think it was his eye! Yes, it was this! One of his eyes resembled that of a vulture—a pale blue eye, with a film over it. Whenever it fell upon me, my blood ran cold; and so by degrees—very gradually—I made up my mind to take the life of the old man, and thus rid myself of the eye forever.
 
-The lighthouse had become his <span class="word" data-word="sanctuary">sanctuary</span>, a place where time moved differently. The <span class="word" data-word="ebullient">ebullient</span> waves crashed against the rocks below, their <span class="word" data-word="melodic">melodic</span> rhythm a constant companion. In the quiet moments, he would read the old books that lined his small library, their pages yellowed with age.
+You fancy me mad. Madmen know nothing. But you should have seen me. You should have seen how wisely I proceeded—with what caution—with what foresight, with what dissimulation, I went to work! I was never kinder to the old man than during the whole week before I killed him. And every night, about midnight, I turned the latch of his door and opened it oh, so gently! And then, when I had made an opening sufficient for my head, I put in a dark lantern, all closed, closed so that no light shone out, and then I thrust in my head. Oh, you would have laughed to see how cunningly I thrust it in! I moved it slowly—very, very slowly, so that I might not disturb the old man's sleep. It took me an hour to place my whole head within the opening so far that I could see him as he lay upon his bed. Ha! would a madman have been so wise as this?
 
-One winter, a terrible storm arrived. The wind howled with <span class="word" data-word="ferocious">ferocious</span> intensity, and the sea became a churning mass of <span class="word" data-word="turbulent">turbulent</span> water. Thomas knew that somewhere out there, a fishing boat was struggling to return to harbor. He lit the lamp extra bright, its <span class="word" data-word="luminous">luminous</span> beam cutting through the darkness like a sword.
+And then when my head was well in the room I undid the lantern cautiously—oh, so cautiously—cautiously (for the hinges creaked), I undid it just so much that a single thin ray fell upon the vulture eye. And this I did for seven long nights, every night just at midnight, but I found the eye always closed; and so it was impossible to do the work, for it was not the old man who vexed me but his Evil Eye.
 
-When morning came, the storm had passed. The boat had made it safely to port. Thomas stood at his window, watching the sun rise over a peaceful sea, knowing that his work still mattered.`,
-        summary: "This story explores themes of solitude, purpose, and dedication. Thomas, the lighthouse keeper, finds meaning in his isolated life through his daily rituals and the knowledge that his work saves lives. The storm scene highlights the importance of perseverance and the profound impact one person can have, even alone."
+On the eighth night I was more than usually cautious. The pale blue eyes were dimmed by a thick veil, but I could see the film. The old man had been making hourly preparations. He was about to anticipate me. He tried to rise, but I knew that I had him. Now I could leave the lantern fairly opened and still be quick. But what more could I do? At last, when I had waited a long time, very patiently, without hearing him lie down, I resolved to open a little—a very, very little crevice in the lantern.
+
+So I opened it—you cannot imagine how stealthily, stealthily—until at last a single dim ray shot out from the crevice and fell full upon the vulture eye.
+
+I saw the eye. It was open! I could see nothing but the pale blue film. But what was that? It was not the old man. There was no Evil Eye. But perhaps there was a mist before it, or perhaps the film was more thick than usual. Yet even through the mist I could see the outlines of the film. Then came a low, dull, quick sound, such as a watch makes when enveloped in cotton. I knew that sound well too. It was the beating of the old man's heart. It increased my fury as the darksome tree.
+
+But still he held his peace. I knew what the old man felt, but I did not wait to hear his suppressed groans. I felt that I must scream or die! And now—again!—hark! louder! louder! louder! louder!
+
+"Villains!" I shrieked, "dissemble no more! I admit the deed! tear up the planks! here, here! It is the beating of his hideous heart!"`,
+        summary: "The Tell-Tale Heart is a psychological thriller about an unnamed narrator who murders an old man due to his obsession with the man's 'vulture eye.' The story explores guilt, madness, and the narrator's deteriorating mental state as he confesses to the crime, ultimately driven to insanity by the imagined sound of the victim's heart."
       },
       {
         id: 2,
-        title: "The Garden of Memories",
-        author: "A Story of Growth",
-        preview: "A young woman inherits her grandmother's mysterious garden and discovers its magical properties.",
-        content: `When Maya inherited her grandmother's cottage, she didn't expect to find a garden that seemed to exist outside of time. The flowers bloomed in impossible colors, and the trees bore fruit that tasted of memories.
+        title: "The Cask of Amontillado",
+        author: "Edgar Allan Poe (1846)",
+        preview: "A tale of revenge frozen in time, as Montresor lures Fortunato deep into the catacombs.",
+        content: `The thousand injuries of Fortunato I had borne as I best could, but when he ventured upon insult I vowed revenge. You, who so well know the nature of my soul, will not suppose, however, that I gave utterance to a threat. At length I would be avenged; this was a point definitely settled—but the very definitiveness with which it was resolved precluded the idea of risk. I must not only punish but punish with impunity. A wrong is unredressed when the retributor seeks to attain it also in turn. I must see to it that I place Fortunato in an impregnable position.
 
-Her grandmother had always been <span class="word" data-word="eccentric">eccentric</span>, known for her peculiar habits and the way she spoke to plants as if they could understand. Now, standing in the garden, Maya understood why.
+It was toward the close of a convivial afternoon that I encountered my friend. He accosted me with excessive warmth, for he had been drinking much. The man wore motley. He had on a tight-fitting part-striped dress, and his head was surmounted by the conical cap and bells.
 
-The roses were <span class="word" data-word="verdant">verdant</span> and lush, their petals soft as silk. A small pond reflected the sky like a mirror, its surface <span class="word" data-word="serene">serene</span> and clear. Maya spent her days tending to the plants, learning their secrets.
+"I am glad to find you," I said, "in a good humor. I have received a pipe of what passes for Amontillado. I have my doubts."
 
-One day, she bit into a golden apple and suddenly remembered her grandmother's laugh—that bright, <span class="word" data-word="effervescent">effervescent</span> sound that had always made her feel safe. Another fruit tasted of summer rain on hot pavement, another of the chalk dust in her old classroom.
+"How?" he said. "Amontillado? A pipe! Impossible! And in the middle of the carnival!"
 
-The garden was not just a collection of plants; it was a living archive of moments, a place where memories could be <span class="word" data-word="savored">savored</span> again. Maya realized that her grandmother's greatest gift was not the cottage or the garden, but the understanding that love never truly fades—it simply waits to be remembered.`,
-        summary: "The Garden of Memories is a touching story about legacy, loss, and the way love persists beyond death. Through the magical garden, Maya learns that our memories are precious gifts, and that those we lose live on in the moments we remember."
+"I have my doubts," I replied; "and I was silly enough to pay the full Amontillado price without consulting you in the matter. You were not to be found, and I was fearful of losing a bargain."
+
+"Amontillado!"
+
+"I have my doubts."
+
+"Amontillado!"
+
+"And I must satisfy them."
+
+"Amontillado!"
+
+"As you are engaged, I am on my way to Luchesi. If any one has a critical turn it is he. He will tell me——"
+
+"Luchesi cannot tell Amontillado from sherry."
+
+"And yet some fools will have it that his taste is a match for your own."
+
+"Come, let us go."
+
+"Whither?"
+
+"To your vaults."
+
+"My friend, no; I will not impose upon your good nature. I perceive you have an engagement. Luchesi——"
+
+"I have no engagement; come."
+
+"My friend, no. It is not the engagement, but the severe cold with which I perceive you are afflicted. The vaults are insufferably damp. They are encrusted with nitre."
+
+"Let us go, nevertheless. The cold is merely nothing. Amontillado! You have been imposed upon."
+
+Thus speaking, Fortunato walked onward, me with him. We proceeded along the wall of the vast crypt in which the bones were deposited. We passed through a series of low arches, descended, and met, more geometrice style, on stepping forward, my foot struck against some fragment of a coping stone, which lay in such a position as to cause me to stumble and fall upon my face.
+
+I had hardly recovered when I felt myself seized by the arm of Fortunato. He had been solicitous for my welfare, and he now congratulated me upon my having escaped a dangerous and almost fatal stumble.
+
+"It is a pipe of Amontillado," he said, as we emerged from the confusion of the fallen stones. "We will have a fire, to dissipate the dampness."
+
+"The vaults are insufferably damp," I replied. "Let us proceed. But we shall have Luchesi to supper with us."
+
+"I said——"
+
+"Proceed, then. The walls have already begun to drip, and the floor is hazardous."
+
+We continued our route, descending rapidly, until we had reached the lowest crypt. Another step and we stood upon the body of the founder of the city, at the foot of a steep descent.
+
+My heart grew sick; it was the dampness of the catacombs that made me so. I paused, and Fortunato also paused.
+
+"It is the Amontillado," he said.
+
+"True," I replied. "The Amontillado."`,
+        summary: "The Cask of Amontillado is a dark tale of revenge set in 18th-century Italy. Montresor, the narrator, lures his rival Fortunato into the family catacombs under the pretense of tasting a rare wine. Once deep underground, he walls Fortunato in alive, leaving him to die. The story chillingly depicts the cold, calculated nature of perfect revenge."
       },
       {
         id: 3,
-        title: "The Coffee Shop on Maple Street",
-        author: "Urban Tales",
-        preview: "A heartwarming story about strangers who become family in a small neighborhood coffee shop.",
-        content: `The coffee shop sat on the corner of Maple and Fifth, a <span class="word" data-word="quaint">quaint</span> little place with worn wooden floors and the smell of fresh roasted beans. Its owner, Maria, had run it for thirty years, and she knew every customer by name.
+        title: "The Gift of the Magi",
+        author: "O. Henry (1905)",
+        preview: "A young couple's sacrifice at Christmas reveals the true meaning of love.",
+        content: `One dollar and eighty-seven cents. That was all. And sixty cents of it was in pennies. Pennies saved one and two at a time by bulldozing the grocer and the vegetable man and the butcher until one's cheeks burned with the silent imputation of parsimony that such close dealing implied. Three times Della counted it. One dollar and eighty-seven cents. And the next day would be Christmas.
 
-On a cold November morning, a young man named Daniel walked in, shivering from the <span class="word" data-word="biting">biting</span> wind. He was new in town, having moved for a job that hadn't worked out. Maria handed him a cup of coffee—on the house—and told him to sit wherever he liked.
+There was clearly nothing to do but flop down on the shabby little couch and howl. So Della did it. Which instigates the moral reflection that life is made up of sobs, sniffles, and smiles, with sniffles predominating.
 
-Over the following weeks, Daniel became a regular. He noticed that the shop attracted an eclectic <span class="word" data-word="assortment">assortment</span> of people: the elderly professor who came for his morning paper, the tired mother with her energetic toddler, the aspiring writer who typed furiously at the corner table.
+While the mistress of the home is gradually subsiding from the first stage to the second, take a look at the home. A furnished flat at eight dollars per week. It did not exactly beggar description, but it certainly had that word on the lookout for the mendicancy squad.
 
-One evening, when the power went out, Maria lit candles and the customers stayed. They shared stories, their <span class="word" data-word="convivial">convivial</span> atmosphere turning strangers into friends. Daniel realized that home wasn't a place—it was the people who made you feel like you belonged.
+In the vestibule below was a letter-box into which no letter would go, and an electric button from which no mortal finger could coax a ring. Also appertaining thereunto was a card bearing the name "Mr. James Dillingham Young."
 
-By Christmas, Daniel had found a new job and new friends. He had also discovered that the coffee shop had become his anchor, a place where he was always welcome. Maria's simple act of kindness had created a <span class="word" data-word="ripple">ripple</span> effect, touching everyone who walked through those doors.`,
-        summary: "This story celebrates community and the small acts of kindness that bind us together. Through Maria's coffee shop, we see how one person's warmth can create a ripple effect, transforming strangers into a family."
+The "Dillingham" had been flung to the breeze during a former period of prosperity when its possessor was being paid thirty dollars per week. Now, when the income was shrunk to twenty dollars, though, they were thinking seriously of contracting to a modest and unassuming D. But whenever Mr. James Dillingham Young came home and reached his flat above he was called "Jim" and greatly hugged by Mrs. James Dillingham Young, already introduced to you as Della. Which is all very good.
+
+Della finished her cry and attended to her cheeks with the powder rag. She stood by the window and looked out dully at a gray cat walking a gray fence in a gray backyard. Tomorrow would be Christmas Day, and she had only $1.87 with which to buy Jim a present. She had been saving every penny she could for months, with this result. Twenty dollars a week doesn't go far. Expenses had been greater than she had calculated. They always are. Only $1.87 to buy a present for Jim. Her Jim. Many a happy hour she had spent planning for something nice for him. Something fine and rare and sterling—something just a little bit near to being worthy of the honor of being owned by Jim.
+
+There was a pier-glass between the windows of the room. Perhaps you have seen one in an antique shop, hung with jade-colored rococo frame. An agile person could see a great deal of herself in it, reversed. Della was sufficiently slender to have the gift of achieving a total inspectability.
+
+Suddenly she whirled from the window and stood before the mirror. Her eyes were shining brilliantly, but her face had lost its color within twenty seconds. Rapidly she pulled down her hair and let it fall to its full length.
+
+Now, there were two possessions of the James Dillingham Youngs in which they both took a mighty pride. One was Jim's gold watch that had been his father's and his grandfather's. The other was Della's hair. Had the queen of Sheba lived in the flat across the area, Della would have let her hair hang out the window some day to dry just to depreciate Her Majesty's jewels and gifts. Had King Solomon been the janitor, with all his treasures piled up in the basement, Jim would have pulled out his watch every time he passed, just to see him pluck at his beard from envy.
+
+So now Della's beautiful hair fell about her, rippling and shining like a cascade of brown waters. It reached below her knee and made itself almost a garment for her. And then, with a quick, sensitive movement, she twisted it into a messy coil.
+
+She again became swiftly businesslike. She put on her old brown jacket. Her old brown hat. Her eyes were shining, but her face had lost its color within twenty seconds. She ran out of the door and down the stairs to the street.
+
+Where she stopped, the sign read: "Mgnonette Hair Goods of All Kinds." Della ran up a flight of stairs, breathless. She halted at the counter, breathless. A tall, severe-looking woman didn't quite seem to welcome her.
+
+"Twenty dollars," said Della, "I want to sell my hair."
+
+"Take it out," said the woman. "Twenty dollars."
+
+Lacking the later refinement of a later hour, the magic of a genuinely beloved Christmas present was Della's shop for two hours. And while Jim was not looking, he got what he wanted. He was going to find it out by the smile of exultation on her face—she had to know that he knew—but would that have been Christmas-y?
+
+Out into the street she ran. She halted there, indecisive. Twenty dollars was not a pin. She had already spent her head on Jim's present. She had sold her hair for twenty dollars. Now what was she going to buy for Jim?`,
+        summary: "The Gift of the Magi is a heartwarming Christmas story about a young couple, Della and Jim, who each sacrifice their most prized possession to buy a gift for the other. Della sells her beautiful hair to buy Jim a platinum watch chain, while Jim sells his gold watch to buy Della a set of hair combs. Their mutual sacrifice, while rendering both gifts useless, demonstrates the true spirit of love."
       },
       {
         id: 4,
-        title: "The Art of Letting Go",
-        author: "Reflections",
-        preview: "A reflective essay on finding peace in acceptance and the courage required to release what we cannot hold.",
-        content: `We spend so much of our lives holding on. We grip our dreams tightly, terrified that letting go means failure. We cling to relationships that have run their course, mistaking <span class="word" data-word="persistence">persistence</span> for commitment. We hold onto anger like a treasured possession, not realizing it's weighing us down.
+        title: "The Necklace",
+        author: "Guy de Maupassant (1884)",
+        preview: "A woman borrows a diamond necklace and loses it, spending years paying for her mistake.",
+        content: `She was one of those pretty and charming girls born, as though fate had blundered over her, into a family of artisans. She had no marriage portion, no expectations, no means of getting known, understood, loved, and wedded by a man of wealth and distinction; and she let herself be married off to a little clerk in the Ministry of Education.
 
-But what if letting go isn't giving up? What if it's actually the bravest thing we can do?
+Her tastes were simple because she had never been able to afford any other, but she was as unhappy as though she had married beneath her; for women have no caste or class, their beauty, grace, and charm serving them for birth or family, their natural delicacy, their instinctive elegance, their nimbleness of wit, are their only mark of rank, and put the slum girl on a level with the highest lady in the land.
 
-The Japanese art of <span class="word" data-word="kintsugi">kintsugi</span> teaches us something profound. When a ceramic bowl breaks, rather than hiding the cracks or discarding the piece, they repair it with gold. The <span class="word" data-word="flaw">flaw</span> becomes part of the object's history, its story enhanced rather than diminished.
+She suffered endlessly, feeling herself born for every delicacy and luxury. She suffered from the poorness of her house, from its mean walls, worn chairs, and ugly curtains. All these things, of which other women of her class would not even have been aware, tormented and insulted her. The sight of the little Breton girl who came to do the work in her little house aroused heart-broken regrets and hopeless dreams in her mind.
 
-Similarly, our losses and failures are not endpoints but transformations. The <span class="word" data-word="resilient">resilient</span> human spirit doesn't pretend that pain doesn't exist—we acknowledge it, honor it, and then release it.
+One evening her husband came home bearing a large envelope in his hand.
 
-Letting go requires <span class="word" data-word="vulnerability">vulnerability</span>. It means admitting that we cannot control everything. It means trusting that what comes next might be even more beautiful than what we're afraid to lose.
+"Here," said he, "here is something for you."
 
-In the end, we are not defined by what we hold onto, but by what we're willing to release.`,
-        summary: "This essay explores the difficult but necessary art of letting go. Using kintsugi as a metaphor, the author argues that our scars and losses can become sources of beauty and strength. True courage lies not in holding on, but in releasing what no longer serves us."
+She tore the paper roughly open, and took out a printed card bearing these words:
+
+"The Minister of Education and Madame Ramponneau request the honour of the company of M. and Madame Loisel at the Ministry on the evening of Monday, January the 18th."
+
+Instead of being delighted, as her husband had hoped, she threw the invitation spitefully on the table, murmuring:
+
+"What do you want me to do with this?"
+
+"But, my dear, I thought you would be pleased. You never go out, and this is a great occasion. I had terrible difficulty in getting it. Every one wants to go; it is very select, and they are not giving many invitations to clerks."
+
+She looked at him fixedly, entered upon a quivering voice:
+
+"What do you mean by saying there is nothing for me to wear?"
+
+But he went on without hearing her:
+
+"However, you might look if you have anything suitable. It seems to me that you might wear the dress we wear when we go to the theatre."
+
+He stopped, distracted, seeing that his wife was weeping. Two great tears fell slowly from the corners of her eyes towards the corners of her mouth.
+
+"What's the matter? What's the matter?" he cried.
+
+By a violent effort she conquered her grief, wiped her eyes, answered in a calm voice:
+
+"Nothing. Only I have no dress, and therefore I cannot go to this ball. Give your card to some colleague of yours whose wife is better equipped."
+
+He was in a fever of distress.
+
+"Here," he said, "you must spend a hundred francs, and you must manage to get a dress."
+
+Then she cried again, and he was reckless with the money.`,
+        summary: "The Necklace is a famous short story about Mathilde Loisel, a woman who borrows a beautiful diamond necklace for a party, loses it, and then spends ten years working to pay off the debt to replace it—only to discover the original was worthless. The story is a powerful commentary on vanity, social class, and the illusion of wealth."
       },
       {
         id: 5,
-        title: "The Midnight Train",
-        author: "Mystery Short Story",
-        preview: "A mysterious stranger boards a train that shouldn't exist, leading to an unforgettable journey.",
-        content: `The clock struck midnight as Sarah found herself standing on an empty platform she had never seen before. The old sign read "Platform 9½"—impossible, yet there it was.
+        title: "A Rose for Emily",
+        author: "William Faulkner (1930)",
+        preview: "The strange tale of a reclusive woman in the American South and the secrets of her house.",
+        content: `When Miss Emily Grierson died, the whole town went to her funeral: the men through a sort of respectful affection for a fallen monument, the women mostly out of curiosity to see the inside of her house, which no one save an old man-servant—and a gardener—had seen in at least ten years.
 
-A train emerged from the <span class="word" data-word="silhouetted">silhouetted</span> darkness, its cars gleaming with an otherworldly <span class="word" data-word="luminescence">luminescence</span>. The conductor, a tall man with <span class="word" data-word="piercing">piercing</span> eyes, smiled warmly.
+It was a big, squarish frame house that had once been white, decorated with cupolas and spires and scrolled balconies in the heavily lightsome style of the seventies, set on what had once been our most select street. But garages and cotton gins had encroached and obliterated even the august names of that neighborhood; only Miss Emily's house was left, lifting its stubborn and incongruous coarseness against a cinder-blotted sky.
 
-"Last train of the evening," he said. "Destination: Anywhere you need to go."
+Now Miss Emily had been a tradition, a duty, and a care; a sort of hereditary obligation upon the town, and as soon as the new generation became free-thinking, it raised questions in its mind and produced queries about the form of Emily's dateless ritual. She was the last and also the only one of the great house.
 
-Sarah, exhausted from months of grief after her mother's passing, stepped aboard. The car was empty except for an elderly woman knitting in the corner. She looked up and smiled—"Same journey, different passenger."
+When her father died, it got about that the house was all that was left to her; but in a very few years, it was plain that she would have to go somewhere. It is a lesson that the teaching of Miss Emily's life was enough to show that she really had no one to provide for or to leave. So she had to rely on the negroes, who seemed to have a particular bent for managing the affairs of the last Grierson. They were a curious lot, as much a part of the Grierson tradition as the house itself.
 
-As the train moved, the windows showed not the familiar city, but scenes from Sarah's life. She saw her mother laughing at the kitchen table, teaching her to ride a bike, holding her hand on the first day of school.
+When her father died, the negroes went to bring her sense of an obligation. She did not really accept their attentions; she endured them, not by receiving them or thanking for them, but just by enduring them as she had endured the attentions of the various young men who at one time or another had courted her. They gave her a feeling of obligation to keep up the standard of the house.
 
-The <span class="word" data-word="cathartic">cathartic</span> experience washed over her like a wave. She cried, but these were tears of healing, not pain.
+She looked at them with that blank face she had worn through years of standing at the upper window with the negro men. When her father died she had been twenty-seven, and she was perhaps a little past thirty-five at the time of her strangeVL, and the two women who had been her father's housekeeper and cook stayed on after his death. They were a curious pair: a negress who was tall and very stout, with small hands and feet, and a small-eyed, yellow-skinned man with a curious stillness of carriage—until the day of his death he never spoke. These two kept the house together, a house that had been built for the Griersons by Emily's grandfather.
 
-When the train stopped, the conductor bowed. "Destination: Acceptance. Thank you for riding."
+But they were not sufficient. She had to have someone to bring her things to the door, someone to pump water for her when the town stopped delivering it. The first someone was a free man, a sort of handyman, but the town had to intervene in his case.
 
-Sarah woke in her own bed, the morning sun streaming through the window. But on her nightstand sat a small golden key—and a note: "For when you need to visit again."`,
-        summary: "The Midnight Train is a magical realism story about grief and healing. Sarah's journey on the impossible train allows her to process her mother's death by reliving precious memories. The story suggests that closure comes not from forgetting, but from finding peace in our memories."
+The men who went to see her about the taxes suggested that she should let them take over her tax matters, but she had her own views about that. She was too intelligent to fall into the common error of someone who has never had to give an accounting of herself: that her just share of the common necessities of life was something she could buy with money. She had the feeling that the taxes were a sort of tangible recognition of her importance to the community, and so she kept them paid.`,
+        summary: "A Rose for Emily is a Gothic mystery about Emily Grierson, a reclusive woman in Jefferson, Mississippi, who keeps to herself in her decaying mansion after her father's death. The townspeople gossip about her strange behavior, and after her death, they discover a shocking secret in her house. The story explores themes of tradition, change, isolation, and the dark side of the American South."
       },
       {
         id: 6,
-        title: "The Silent Orchestra",
-        author: "A Musical Mystery",
-        preview: "A deaf boy discovers a hidden world of music that only he can see.",
-        content: `Marcus had never heard a single note in his life. Born <span class="word" data-word="profoundly">profoundly</span> deaf, he had learned to navigate a world that seemed to pulse with vibrations rather than sound. But everything changed when he found his grandmother's old piano.
+        title: "The Lottery",
+        author: "Shirley Jackson (1948)",
+        preview: "A small town's annual tradition takes a chilling turn in this celebrated short story.",
+        content: `The morning of June 27th was clear and sunny, with the fresh warmth of a full-summer day; the flowers were blossoming profusely and the grass was richly green. The people of the village began to gather in the square, between the post office and the bank, around ten o'clock; in some towns there were so many people that the lottery took two days and had to be started on June 26th, but in this village, where there were only about three hundred people, the whole lottery took less than two hours, so it could begin at ten o'clock in the morning and still be through in time to allow the villagers to get home for noon dinner.
 
-When his fingers touched the keys, something miraculous happened. He couldn't hear the notes, but he could <span class="word" data-word="see">see</span> them—colorful waves that rippled through the air like the aurora borealis. Each chord created its own <span class="word" data-word="cascade</span> of visual beauty.
+The children assembled first, of course. School was recently over for the summer, and the feeling of liberty sat uneasily on most of them; they tended to gather together quietly for a while before they broke into boisterous play, and their talk was still of the classroom and the teacher, of books and mild reprimands. Bobby Martin had already stuffed his pockets full of stones, and the other boys soon followed his example, selecting the smoothest and roundest stones; Bobby and Harry Jones and Dickie Delacroix—the villagers had forgotten their other names—the stones were chipped and flaked and pointed, with which to bore the holes in the sitting-up stones. The girls stood aside, talking among themselves, looking over their shoulders at the boys. And no boys manifested any particularly gentle instincts toward the girls.
 
-His grandmother had been a concert pianist before she lost her sight. She had developed this unique ability to "see" music, and now Marcus understood why she had kept it secret. "Music is <span class="word" data-word="omnipresent</span>," she told him once. "You just had to learn a different language."
+The lottery itself was conducted by Mr. Summers, who had time and energy to devote to civic activities. He was a round-faced, jovial man, and he had run the lottery for nine years now, ever since there had been a lottery in the village. This year, too, he seemed very nervous, though he was seldom anything else, and when he spoke it was in a voice that carried no tone of opinion about the lottery at all.
 
-Word spread about the boy who could see symphonies. People came from far and wide to watch him play. They saw what he saw—colors dancing, shapes morphing, a <span class="word" data-word="transcendent</span> display of beauty that transcended the boundaries of mere sound.
+The people were ready for the lottery to begin. They were waiting for the arrival of Mr. Summers and the two other officials of the lottery—the rather frightening one, Mr. Graves—and the official in black. Mr. Summers made a great show of opening his briefcase, which was empty, and produced a solid wooden box. The box had no part in the lottery's history.
 
-But Marcus's greatest performance came at the town concert hall. As he played Debussy's "Clair de Lune," the audience gasped. The air above the piano bloomed with soft blue and silver <span class="word" data-word="luminescent</span> waves, more beautiful than anything they had ever seen.
+Now the lottery began. The idea was simply anyone who wanted to do so could draw a slip of paper from the box. Everyone in the village would have a chance, except the children, who were not considered old enough to make decisions for themselves. The idea was that anyone who drew a certain marked slip would have to participate in the ritual, though the ritual itself varied slightly from year to year.
 
-In that moment, everyone in the audience understood: music was never just about hearing. It was about feeling, seeing, experiencing something greater than yourself.`,
-        summary: "The Silent Orchestra is an inspiring story about finding your own way to experience the world. Marcus discovers that limitations can become unique gifts, and that beauty exists in many forms beyond our normal senses."
-      },
-      {
-        id: 7,
-        title: "The Clockmaker's Last Gift",
-        author: "A Story of Time",
-        preview: "An elderly clockmaker builds one final timepiece that holds a secret decades in the making.",
-        content: `Old Henri had spent seventy years crafting <span class="word" data-word="exquisite</span> timepieces in his tiny shop on Rue de l'Horloge. His hands, once steady as stone, now trembled with age. But there was one more clock he needed to make.
+The first person to draw was Mrs. Hutchinson, a housewife and mother. She moved into the circle, smiling, and placed her slip of paper against her chest so that no one could see what was written there. She was immediately surrounded by the other villagers, who all wanted to see what she had drawn.
 
-The clock he built was unlike any other. Its <span class="word" data-word="intricate</span> gears were carved with tiny scenes from a life: a woman laughing in a garden, children playing by a river, a house with blue shutters. Each detail was <span class="word" data-word="meticulously</span> crafted, a lifetime of memory etched into brass and steel.
+When she opened her slip, there was a collective gasp. Mrs. Hutchinson had drawn the marked slip—the one that meant she had been chosen. But surely, she said, there must be some mistake. She had only just drawn, and surely the lottery could not be over already. Mr. Summers reminded her that the rules were clear: once your name was called, you had to see it through.
 
-When he finally finished, Henri called his estranged daughter Claire to the shop. They hadn't spoken in twenty years—not since her mother's death. The <span class="word" data-word="acerbic</span> words exchanged then had created a wound that never healed.
+The crowd began to close in around Mrs. Hutchinson as she protested more violently. Someone suggested that perhaps the Hutchinson family could draw again, but the rules did not allow for that. Mr. Summers ordered the other villagers to proceed with the stoning, reminding them that this was a necessary tradition.
 
-"I made this for you," he said, his voice barely a whisper. "It took me seventy years to understand what time really means."
-
-Claire looked at the clock. Instead of numbers, the face showed scenes from her childhood—each hour a different memory. At the center, where the hands met, was a tiny portrait of her mother.
-
-"Time doesn't <span class="word" data-word="diminish</span> anything," Henri continued. "It just changes how we remember. Every moment we've lived is still here, frozen in these gears."
-
-Claire understood then. Her father hadn't been <span class="word" data-word="negligent</span> all those years—he had been preserving their family, one gear at a time.`,
-        summary: "The Clockmaker's Last Gift is a touching tale about reconciliation and the true nature of time. Henri's final masterpiece shows that love doesn't fade—it simply transforms into memory, preserved forever in the things we create."
-      },
-      {
-        id: 8,
-        title: "Why We Dream",
-        author: "Scientific Essay",
-        preview: "An exploration of the science and mystery behind why we spend a third of our lives dreaming.",
-        content: `Every night, without fail, we close our eyes and <span class="word" data-word="embark">embark</span> on journeys that defy logic. We fly without wings, speak to the dead, and confront fears we didn't know we possessed. But why do we dream?
-
-Modern neuroscience offers fascinating <span class="word" data-word="insights">insights</span>. During REM sleep, our brains become nearly as active as when we're awake. The <span class="word" data-word="prefrontal cortex</span>—responsible for logic and reasoning—goes quiet, while the emotional centers light up like a Christmas tree.
-
-This explains why our dreams often feel so <span class="word" data-word="irrational">irrational</span>. Without the brain's fact-checker running, our minds are free to create, connect, and confuse. We dream to process emotions, to practice for threats, to <span class="word" data-word="consolidate</span> memories.
-
-But there's something more. <span class="word" data-word="Ancient cultures</span> believed dreams were messages from the divine, windows into other worlds. Modern researchers, while skeptical of the supernatural, admit we don't fully understand why certain dreams feel so meaningful.
-
-Perhaps dreams serve a deeper purpose: they keep us <span class="word" data-word="creative</span>. In the theater of sleep, we can be heroes, villains, lovers, and strangers. We can resolve conflicts, explore possibilities, and experience lives we'll never live.
-
-In the end, dreaming reminds us that reality is just one version of truth. Every night, we <span class="word" data-word="transcend</span> the boundaries of the possible and touch something infinite.`,
-        summary: "This essay explores the science and mystery of dreams. While neuroscience has revealed much about how dreams work, the question of why we dream—and what they mean—remains one of the great mysteries of the human experience."
-      },
-      {
-        id: 9,
-        title: "The Weight of a Feather",
-        author: "A Tale of Forgiveness",
-        preview: "A woman discovers that some burdens are lighter than they appear, and forgiveness is the key to setting them down.",
-        content: `Elena had carried the weight of her sister's death for fifteen years. The <span class="word" data-word="anguish</span> had become part of her—visible in the lines on her face, the heaviness in her step. She had been driving the car when the accident happened.
-
-One autumn day, she received a letter. It was from a <span class="word" data-word="convent">convent</span> three hundred miles away. A nun named Sister Maria had passed away, and among her belongings, they found Elena's name. Inside was a single feather, pressed between two pages of handwritten words.
-
-"You cannot change the past," the letter read. "But you can change the weight you carry. A feather seems light, but when you grip it tightly for years, it becomes a stone. Learn to let it <span class="word" data-word="drift">drift</span> away."
-
-Elena drove to the convent, hoping to understand. The nuns told her that Sister Maria had received a <span class="word" data-word="revelation</span> one night—a calling to help those who suffered from <span class="word" data-word="unresolved">unresolved</span> guilt. She had written hundreds of letters to strangers, offering forgiveness they hadn't known they needed.
-
-For the first time in fifteen years, Elena cried. Not the <span class="word" data-word="hysterical">hysterical</span> tears of grief, but the soft tears of release. She understood now that her sister would have forgiven her long ago. The only person still holding onto the accident was Elena herself.
-
-She let the feather go. It <span class="word" data-word="floated">floated</span> upward, caught by a gentle wind. As it disappeared into the blue sky, Elena felt something she hadn't felt in years: peace.`,
-        summary: "The Weight of a Feather explores the burden of guilt and the liberation that comes from forgiveness. Elena learns that holding onto past mistakes only prolongs suffering, and that true peace comes from learning to let go."
-      },
-      {
-        id: 10,
-        title: "The Last Bookshop",
-        author: "A Love Letter to Stories",
-        preview: "In a world of screens, one old man keeps the flame of reading alive in his tiny bookshop.",
-        content: `The sign above the door read "The Last Bookshop" in faded gold letters. It wasn't hyperbole—Mr. Pemberton had counted. There was exactly one bookshop left in the city, and this was it.
-
-The shop was a <span class="word" data-word="cavernous</span> place, its shelves reaching toward the ceiling, stacked with books that smelled of paper and time. Dust motes danced in the <span class="word" data-word="pale">pale</span> light that filtered through the grimy windows.
-
-"You still here?" came a voice one afternoon. A young girl, no more than twelve, stood in the doorway, her eyes wide with curiosity.
-
-Mr. Pemberton <span class="word" data-word="adjusted">adjusted</span> his spectacles. "Seems like it. Can I help you find something?"
-
-"I want to know what it's like to disappear into another world," she said. "My teacher says nobody reads anymore."
-
-Mr. Pemberton smiled—the first smile he'd given in months. He walked to a shelf and pulled down a worn copy of "The Hobbit." "This," he said, "is a door. Once you step through, you'll never be quite the same."
-
-The girl took the book and began to read that night. She finished it in three days. Then she came back for another. And another. Soon, she brought her friends.
-
-Word spread about the old man who sold <span class="word" data-word="enchantment">enchantment</span> in paperback. The shop filled with young people, their faces lit by phone screens one moment and the soft glow of reading lights the next.
-
-Mr. Pemberton died peacefully three years later, surrounded by books. But his shop lives on, now run by the girl—now a young woman—who walked in that autumn day seeking a different world.`,
-        summary: "The Last Bookshop is a celebration of the enduring power of books. Despite the digital age, the story shows that the human hunger for stories remains undiminished, and that passion can be passed from one generation to the next."
+The children, who had been watching quietly, now began to pick up stones. Mrs. Hutchinson's neighbors and even her own children joined in the stoning, following the tradition that had been passed down for generations. In the end, the lottery was complete, and the villagers went back to their normal lives, satisfied that the ritual had been performed as it always had been.`,
+        summary: "The Lottery is a powerful allegory about the dangers of blindly following tradition and the capacity for violence that exists within ordinary communities. Set in a small American town, the story reveals how rituals that seem harmless can mask profound cruelty. Jackson's chilling tale explores themes of conformity, scapegoating, and the sometimes deadly consequences of unexamined tradition."
       }
     ];
 
-    // Word Definitions
-    const definitions = {
-      "crimson": "A deep, rich red color, like the sky at sunset or blood.",
-      "sanctuary": "A place of safety, refuge, or retreat; a holy place.",
-      "ebullient": "Cheerful and full of energy; enthusiastic.",
-      "melodic": "Having a pleasant, musical sound; relating to melody.",
-      "ferocious": "Savagely fierce or violent; intense.",
-      "turbulent": "Characterized by conflict, disorder, or violent movement.",
-      "luminous": "Emitting or reflecting light; bright or shining.",
-      "eccentric": "Unconventional and slightly strange; off-center.",
-      "verdant": "Green with grass or other rich vegetation; lush.",
-      "serene": "Calm, peaceful, and untroubled.",
-      "effervescent": "Vivacious and enthusiastic; giving off bubbles.",
-      "savored": "Enjoyed something slowly or thoroughly; appreciated.",
-      "quaint": "Attractively unusual or old-fashioned; charming.",
-      "biting": "Sharp and painfully cold; sarcastic.",
-      "assortment": "A collection of various different things or people.",
-      "convivial": "Friendly, warm, and pleasant; festive.",
-      "ripple": "A small wave or series of waves; a spreading effect.",
-      "persistence": "The continued existence or occurrence of something.",
-      "kintsugi": "A Japanese art form of repairing broken pottery with gold.",
-      "flaw": "A mark, crack, or fault that spoils appearance or structure.",
-      "resilient": "Able to recover quickly from difficulties; tough.",
-      "vulnerability": "The quality of being open to harm or attack.",
-      "silhouetted": "Seen as a dark shape or outline against a lighter background.",
-      "luminescence": "The emission of light by a substance not due to heat.",
-      "piercing": "Sharp and penetrating; going straight to the point.",
-      "cathartic": "Providing psychological relief through emotion; purifying.",
-      "profoundly": "To a great depth or extent; completely or extremely.",
-      "cascade": "A waterfall or series of small waterfalls; a succession of things.",
-      "omnipresent": "Present, appearing, or found everywhere.",
-      "transcendent": "Beyond or above the range of normal experience; supernatural.",
-      "luminescent": "Emitting light not due to heat; glowing.",
-      "exquisite": "Extremely beautiful and delicate; highly skilled.",
-      "intricate": "Very complicated or detailed; having many detailed elements.",
-      "meticulously": "Showing great attention to detail; very careful and precise.",
-      "acerbic": "Sharp and forthright; harsh or severe in manner or style.",
-      "diminish": "Make or become smaller or less; reduce.",
-      "negligent": "Failing to take proper care or give proper attention.",
-      "embark": "Begin a journey; start a new project or course of action.",
-      "insights": "Deep understanding or intuition about something.",
-      "prefrontal cortex": "The front part of the brain responsible for executive functions.",
-      "irrational": "Not based on reason or logic; illogical.",
-      "consolidate": "Combine into a single more effective whole.",
-      "ancient cultures": "Civilizations that existed in early historical periods.",
-      "creative": "Relating to or involving imagination or original ideas.",
-      "transcend": "Be or do beyond normal experience or ability.",
-      "anguish": "Extreme mental or physical suffering; distress.",
-      "convent": "A community of nuns or monks; a building where they live.",
-      "drift": "Move slowly and calmly; be carried by current or wind.",
-      "revelation": "A surprising and previously unknown fact revealed.",
-      "unresolved": "Not settled or solved; still uncertain.",
-      "hysterical": "Excessively emotional or uncontrolled.",
-      "floated": "Stayed on the surface of a liquid without sinking.",
-      "cavernous": "Like a cave; large and dark with deep recesses.",
-      "pale": "Light in color; lacking brightness or vividness.",
-      "adjusted": "Changed or adapted to fit new conditions.",
-      "enchantment": "A feeling of great pleasure or delight; magic spell."
-    };
-
     let currentStory = null;
 
-    // Initialize
     function init() {
       renderStoryGrid();
-      setupWordClicks();
       window.addEventListener('scroll', updateProgress);
     }
 
@@ -510,8 +461,8 @@ Mr. Pemberton died peacefully three years later, surrounded by books. But his sh
       grid.innerHTML = stories.map(story => `
         <div class="story-card" onclick="openStory(${story.id})">
           <h3>${story.title}</h3>
+          <div class="author">${story.author}</div>
           <p>${story.preview}</p>
-          <div class="meta">${story.author}</div>
         </div>
       `).join('');
     }
@@ -526,17 +477,12 @@ Mr. Pemberton died peacefully three years later, surrounded by books. But his sh
       document.getElementById('storyTitle').textContent = currentStory.title;
       document.getElementById('storyAuthor').textContent = `By ${currentStory.author}`;
       
-      // Add content with summary
       document.getElementById('storyContent').innerHTML = currentStory.content + 
         `<div class="summary">
           <h3>📝 Summary</h3>
           <p>${currentStory.summary}</p>
         </div>`;
-
-      // Re-setup word clicks for new content
-      setupWordClicks();
       
-      // Reset progress
       updateProgress();
     }
 
@@ -545,49 +491,6 @@ Mr. Pemberton died peacefully three years later, surrounded by books. But his sh
       document.getElementById('reader').classList.remove('active');
       currentStory = null;
       document.getElementById('progressBar').style.width = '0%';
-    }
-
-    function setupWordClicks() {
-      document.querySelectorAll('.word').forEach(word => {
-        word.addEventListener('click', (e) => {
-          e.stopPropagation();
-          showDefinition(word.dataset.word, e);
-        });
-      });
-    }
-
-    function showDefinition(word, event) {
-      const popup = document.getElementById('definitionPopup');
-      const definition = definitions[word.toLowerCase()] || "No definition available.";
-      
-      document.getElementById('popupWord').textContent = word;
-      document.getElementById('popupDefinition').textContent = definition;
-
-      // Position popup
-      const x = event.pageX;
-      const y = event.pageY;
-      
-      // Keep popup in viewport
-      const popupWidth = 300;
-      const popupHeight = 150;
-      
-      let left = x + 15;
-      let top = y + 15;
-      
-      if (left + popupWidth > window.innerWidth) {
-        left = x - popupWidth - 15;
-      }
-      if (top + popupHeight > window.innerHeight) {
-        top = y - popupHeight - 15;
-      }
-      
-      popup.style.left = left + 'px';
-      popup.style.top = top + 'px';
-      popup.classList.add('visible');
-    }
-
-    function hideDefinition() {
-      document.getElementById('definitionPopup').classList.remove('visible');
     }
 
     function updateProgress() {
@@ -599,13 +502,6 @@ Mr. Pemberton died peacefully three years later, surrounded by books. But his sh
       
       document.getElementById('progressBar').style.width = progress + '%';
     }
-
-    // Close popup when clicking elsewhere
-    document.addEventListener('click', (e) => {
-      if (!e.target.classList.contains('word')) {
-        hideDefinition();
-      }
-    });
 
     init();
   </script>
